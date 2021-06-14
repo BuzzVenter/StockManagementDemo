@@ -1,0 +1,42 @@
+<mat-spinner *ngIf="isLoading"></mat-spinner>
+<form class="search-form" style="width: 100%;"> <!--[formGroup]="form" (submit)="onSavePost()" *ngIf="!isLoading"-->
+  <input type="search" matInput placeholder="Ex. Toyota" value="Hilux" id="site-search" name="q"
+    [(ngModel)]="searchText" aria-label="Search through stock content"
+    autofocus style="width: 30%;">
+  <button mat-raised-button color="primary" (click)="onSearchPage(searchText)">Search</button>
+</form>
+<br>
+
+<mat-accordion multi="true" *ngIf="posts.length > 0 && !isLoading">
+  <mat-expansion-panel *ngFor="let post of posts">
+    <mat-expansion-panel-header>
+      {{ post.title }}
+    </mat-expansion-panel-header>
+    <div class="post-image" *ngFor="let image of post.imagePaths; index as i">
+        <img [src]="image" width="100%" style="margin: 3px;">
+    </div>
+    <h4>Vehicle Details</h4>
+    <p>Reg No: {{ post.regNo }}</p>
+    <p>Make: {{ post.make }}</p>
+    <p>Model: {{ post.model }}</p>
+    <p>Model Year: {{ post.modelYear | date:"yyyy" }}</p>
+    <p>KMS: {{ post.kms }}</p>
+    <p>Colour: {{ post.colour }}</p>
+    <p>VIN: {{ post.vin }}</p>
+    <p>Retail Price: {{ post.retailPrice | currency:'ZAR':'symbol-narrow' }}</p>
+    <p>Cost Price: {{ post.costPrice | currency:'ZAR':'symbol-narrow' }}</p>
+    <mat-list role="list">
+      <mat-list-item *ngFor="let accessory of post.accessories">
+      Accessories: {{ accessory }}</mat-list-item>
+    </mat-list>
+    <p>Post Created: {{ post.dtCreated | date:"dd/MM/yyyy"}}</p>
+    <p>Post Updated: {{ post.dtUpdated | date:"dd/MM/yyyy" }}</p>
+    <mat-action-row *ngIf="userIsAuthenticated && userId === post.creator">
+      <a mat-button color="primary" [routerLink]="['/edit', post.id]">EDIT</a>
+      <button mat-button color="warn" (click)="onDelete(post.id)">DELETE</button>
+    </mat-action-row>
+  </mat-expansion-panel>
+</mat-accordion>
+<mat-paginator [length]="totalPosts" [pageSize]="postsPerPage" [pageSizeOptions]="pageSizeOptions" (page)="onChangedPage($event)"
+  *ngIf="posts.length > 0"></mat-paginator>
+<p class="info-text mat-body-1" *ngIf="posts.length <= 0 && !isLoading">No posts added yet!</p>
